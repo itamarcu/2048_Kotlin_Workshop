@@ -3,7 +3,7 @@ package games.ui
 import games.game2048.newGame2048
 import java.awt.Color
 
-object Game2048Settings : GameSettings("Itamar's 2048", Color(0xbbada0)) {
+object Game2048Settings : GameSettings("2048++", Color(0xbbada0)) {
     private val emptyColor = Color(0xcdc1b4)
     private var colors: Map<Int, Color> = run {
         val colors = listOf(

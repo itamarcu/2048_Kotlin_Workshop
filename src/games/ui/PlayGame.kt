@@ -4,11 +4,13 @@ package games.ui
 import board.Direction
 import games.game.Game
 import java.awt.*
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
+import java.awt.event.*
+import java.util.*
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.WindowConstants
+import javax.swing.event.MouseInputAdapter
+import kotlin.concurrent.timer
 import kotlin.system.exitProcess
 
 class PlayGame(val game: Game, val settings: GameSettings) : JPanel() {
@@ -47,6 +49,10 @@ class PlayGame(val game: Game, val settings: GameSettings) : JPanel() {
 
     override fun paint(g: Graphics) {
         super.paint(g)
+        val screenLocation = parent.getComponent(0).locationOnScreen
+        val middleOfScreen = Point(600, 200)
+        val delta = Point(middleOfScreen - screenLocation)
+        g.translate(delta.x, delta.y)
         g.color = settings.backgroundColor
         g.fillRect(0, 0, this.size.width, this.size.height)
         for (y in 1..4) {
@@ -54,6 +60,7 @@ class PlayGame(val game: Game, val settings: GameSettings) : JPanel() {
                 drawTile(g as Graphics2D, game[y, x] ?: 0, x - 1, y - 1)
             }
         }
+        g.translate(-delta.x, -delta.y)
     }
 
     private fun offsetCoors(arg: Int): Int {
@@ -112,11 +119,25 @@ fun playGame(game: Game, settings: GameSettings) {
         title = settings.name
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         setSize(340, 400)
-        isResizable = false
+        isResizable = true
 
         add(PlayGame(game, settings))
 
         setLocationRelativeTo(null)
         isVisible = true
+
+        addComponentListener(object: ComponentAdapter() {
+            override fun componentMoved(e: ComponentEvent?) {
+                repaint()
+            }
+        })
     }
+}
+
+operator fun Point.plus(other: Point): Point {
+    return Point(this.x + other.x, this.y + other.y)
+}
+
+operator fun Point.minus(other: Point): Point {
+    return Point(this.x - other.x, this.y - other.y)
 }
